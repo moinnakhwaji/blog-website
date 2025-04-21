@@ -3,12 +3,14 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import Image from "next/image";
+import { useUser } from "@clerk/nextjs";
 
 interface BlogPost {
   title: string;
   content: string;
   imageurl: string;
   author?: string;
+  clerkid?: string;
 }
 
 const Page = () => {
@@ -22,8 +24,8 @@ const Page = () => {
     imageurl: "",
   });
 
+  const { user } = useUser();
   const postId = params?.id as string;
-  const user = { id: "user123" }; // Dummy user
 
   const fetchSingleData = async () => {
     try {
@@ -51,7 +53,7 @@ const Page = () => {
   const handleUpdate = async () => {
     try {
       const response = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/update/${postId}`, {
-        clerkid: user.id,
+        clerkid: user?.id,
         ...updatedData,
       });
 
@@ -133,20 +135,22 @@ const Page = () => {
               <p className="text-lg text-gray-200 leading-relaxed">{data.content}</p>
             </div>
 
-            <div className="flex space-x-4 pt-4">
-              <button
-                onClick={handleDelete}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md"
-              >
-                Delete Post
-              </button>
-              <button
-                onClick={() => setEditMode(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
-              >
-                Edit Post
-              </button>
-            </div>
+            {user?.id === data.clerkid && (
+              <div className="flex space-x-4 pt-4">
+                <button
+                  onClick={handleDelete}
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md"
+                >
+                  Delete Post
+                </button>
+                <button
+                  onClick={() => setEditMode(true)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+                >
+                  Edit Post
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>

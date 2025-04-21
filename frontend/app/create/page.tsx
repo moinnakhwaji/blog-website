@@ -47,7 +47,7 @@ const Create = () => {
 
     try {
       const response = await axios.post(
-        `process.env.${process.env.NEXT_PUBLIC_BACKEND_URL}/api/create`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/create`,
         formdata
       );
       console.log("Submitted:", formdata);
